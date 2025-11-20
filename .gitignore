@@ -4,3 +4,4 @@ dist/
 .vscode/
 *.vsix
 *.log
+*.d.ts.map
