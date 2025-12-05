@@ -5,3 +5,4 @@ dist/
 *.vsix
 *.log
 *.d.ts.map
+test_scripts/log.yaml

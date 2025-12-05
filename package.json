@@ -7,18 +7,21 @@
   "engines": {
     "vscode": "^1.84.0"
   },
-  "categories": ["Debuggers", "Other"],
+  "categories": [
+    "Debuggers",
+    "Other"
+  ],
   "activationEvents": [
+    "onCommand:chatdbg.openPanel",
     "onCommand:chatdbg.runCurrentFile",
     "onCommand:chatdbg.runAndExplain",
     "onCommand:chatdbg.rerunLast",
     "onCommand:chatdbg.openLog",
     "onCommand:chatdbg.runWithDiagnostics",
     "onCommand:chatdbg.explainLastError",
-    "onCommand:chatdbg.runWithArgs",        
-    "onCommand:chatdbg.clearArgs"          
+    "onCommand:chatdbg.runWithArgs",
+    "onCommand:chatdbg.clearArgs"
   ],
-
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
@@ -28,10 +31,15 @@
         "category": "ChatDBG"
       },
       {
-         "command": "chatdbg.openLog",          
-         "title": "ChatDBG: Open Log (log.yaml)",     
-         "category": "ChatDBG" 
-      }, 
+        "command": "chatdbg.openPanel",
+        "title": "ChatDBG: Open Panel",
+        "category": "ChatDBG"
+      },
+      {
+        "command": "chatdbg.openLog",
+        "title": "ChatDBG: Open Log (log.yaml)",
+        "category": "ChatDBG"
+      },
       {
         "command": "chatdbg.runAndExplain",
         "title": "ChatDBG: Run & Explain",
@@ -56,17 +64,21 @@
         "command": "chatdbg.explainLastError",
         "title": "ChatDBG: Explain Last Error",
         "category": "ChatDBG"
-      }, 
-      
-      { "command": "chatdbg.runWithArgs", 
-        "title": "ChatDBG: Run With Args/Stdin" 
       },
-
-      { "command": "chatdbg.clearArgs",   
-        "title": "ChatDBG: Clear Saved Args/Stdin" 
+      {
+        "command": "chatdbg.runWithArgs",
+        "title": "ChatDBG: Run With Args/Stdin"
+      },
+      {
+        "command": "chatdbg.clearArgs",
+        "title": "ChatDBG: Clear Saved Args/Stdin"
+      }, 
+      {
+        "command": "chatdbg.runWithDiagnostics",
+        "title": "Explain with ChatDBG",
+        "when": "editorLangId == python",
+        "group": "navigation@9"
       }
-
-      
     ],
     "configuration": {
       "title": "ChatDBG",
@@ -86,8 +98,10 @@
           "default": "",
           "markdownDescription": "Optional. If set, the extension will `export OPENAI_API_KEY` in the ChatDBG terminal before running. If empty, your shell env is used."
         },
-
-        "chatdbg.unsafe": { "type": "boolean", "default": false, "description": "If true, launch ChatDBG with --unsafe (disables protections; use carefully)." 
+        "chatdbg.unsafe": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, launch ChatDBG with --unsafe (disables protections; use carefully)."
         },
         "chatdbg.model": {
           "type": "string",
@@ -97,7 +111,12 @@
         "chatdbg.format": {
           "type": "string",
           "default": "md",
-          "enum": ["text", "md", "md:simple", "jupyter"],
+          "enum": [
+            "text",
+            "md",
+            "md:simple",
+            "jupyter"
+          ],
           "markdownDescription": "Output format for ChatDBG. `md` or `md:simple` are good terminal experiences. Leave blank to use ChatDBG’s default."
         }
       }
@@ -111,11 +130,11 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.84.0",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.0.0",
-    "typescript": "^5.3.0",
+    "@types/vscode": "^1.84.0",
     "tslint": "^6.1.3",
+    "typescript": "^5.3.0",
     "vsce": "^2.15.0"
-  },
-  "dependencies": {}
+  }
 }

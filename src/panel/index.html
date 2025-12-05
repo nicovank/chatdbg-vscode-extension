@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!--
+    ChatDBG Webview Panel HTML
+
+    This HTML template is embedded in the VSCode webview panel created by extension.ts.
+    The actual HTML used is generated dynamically in ChatDBGPanel.getHtmlForWebview()
+    which adds:
+    - Content Security Policy (CSP) headers
+    - Nonce-based script loading for security
+    - URIs for stylesheets and scripts
+    - Additional panels (diagnostics, history, settings)
+
+    This file serves as a simplified reference for the panel structure.
+    See extension.ts:1396-1513 for the complete HTML generation.
+  -->
+  <head>
+    <meta charset="UTF-8" />
+    <title>ChatDBG</title>
+  </head>
+  <body>
+    <!-- Root container for the entire panel -->
+    <div id="root">
+
+      <!-- Toolbar with action buttons -->
+      <header id="toolbar">
+        <!-- Run current file without AI explanation -->
+        <button id="btn-run">Run</button>
+
+        <!-- Run and automatically ask ChatDBG to explain errors -->
+        <button id="btn-run-explain">Run &amp; Explain</button>
+
+        <!-- Explain the last error that occurred -->
+        <button id="btn-explain-last">Explain Last Error</button>
+
+        <!-- Re-run the last command with same arguments -->
+        <button id="btn-rerun-last">Rerun Last</button>
+
+        <!-- Open the log.yaml file from the last run -->
+        <button id="btn-open-log">Open Last Log</button>
+      </header>
+
+      <!-- Main content area -->
+      <main id="content">
+        <!-- Transcript section - shows ChatDBG output and explanations -->
+        <section id="transcript">
+          <h3>Transcript</h3>
+          <div id="transcript-body">
+            <!-- Dynamically populated with markdown-rendered output -->
+          </div>
+        </section>
+
+        <!-- Debug log section - additional logging information -->
+        <section id="log-section">
+          <h4>Debug Log</h4>
+          <div id="log">
+            <!-- Additional debug information -->
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!--
+      Scripts and styles are injected by extension.ts using webview.asWebviewUri()
+      to ensure proper security and resource loading within the webview context.
+
+      Expected scripts:
+      - marked.min.js: Markdown parser for rendering transcript output
+      - index.js: Main webview logic and event handlers
+
+      Expected styles:
+      - style.css: Panel styling with VSCode theme integration
+    -->
+  </body>
+</html>

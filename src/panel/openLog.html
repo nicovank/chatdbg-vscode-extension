@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatDBG — Last Log</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      background: var(--vscode-editor-background, #1e1e1e);
+      color: var(--vscode-editor-foreground, #cccccc);
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* ================== HEADER ================== */
+
+    .log-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--vscode-editorWidget-border, #444);
+      background: var(--vscode-sideBar-background, #252526);
+      flex-shrink: 0;
+      gap: 12px;
+    }
+
+    .log-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .log-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--vscode-foreground, #ffffff);
+    }
+
+    .log-timestamp {
+      font-size: 11px;
+      color: var(--vscode-descriptionForeground, #888888);
+    }
+
+    .log-nav-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .log-nav-select {
+      font-size: 11px;
+      padding: 4px 8px;
+      border: 1px solid var(--vscode-editorWidget-border, #444);
+      background: var(--vscode-input-background, #1e1e1e);
+      color: var(--vscode-input-foreground, #cccccc);
+      border-radius: 3px;
+      cursor: pointer;
+      max-width: 200px;
+      transition: all 0.15s ease;
+    }
+
+    .log-nav-select:hover {
+      border-color: var(--vscode-editorWidget-border, #555);
+    }
+
+    .log-nav-select:focus {
+      outline: 1px solid var(--vscode-focusBorder, #007acc);
+    }
+
+    .log-nav-buttons {
+      display: flex;
+      gap: 4px;
+    }
+
+    .log-nav-btn {
+      padding: 4px 8px;
+      border: 1px solid var(--vscode-editorWidget-border, #444);
+      background: var(--vscode-button-secondaryBackground, #2d2d30);
+      color: var(--vscode-button-foreground, #ffffff);
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+
+    .log-nav-btn:hover {
+      background: var(--vscode-button-secondaryHoverBackground, #3a3a3d);
+    }
+
+    .log-nav-btn:active {
+      background: var(--vscode-button-hoverBackground, #404040);
+    }
+
+    .log-header-right {
+      display: flex;
+      gap: 6px;
+    }
+
+    .log-action-btn {
+      padding: 4px 8px;
+      border: 1px solid var(--vscode-button-border, transparent);
+      background: var(--vscode-button-secondaryBackground, #2d2d30);
+      color: var(--vscode-button-foreground, #ffffff);
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+
+    .log-action-btn:hover {
+      background: var(--vscode-button-secondaryHoverBackground, #3a3a3d);
+    }
+
+    /* ================== MAIN CONTENT ================== */
+
+    .log-content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .log-content::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .log-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .log-content::-webkit-scrollbar-thumb {
+      background: var(--vscode-scrollbarSlider-background, #797979);
+      border-radius: 5px;
+    }
+
+    .log-content::-webkit-scrollbar-thumb:hover {
+      background: var(--vscode-scrollbarSlider-hoverBackground, #a0a0a0);
+    }
+
+    /* ================== CARD STYLES ================== */
+
+    .log-card {
+      background: var(--vscode-editor-background, #1e1e1e);
+      border: 1px solid var(--vscode-editorWidget-border, #444);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      transition: all 0.15s ease;
+    }
+
+    .log-card:hover {
+      border-color: var(--vscode-editorWidget-border, #555);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ================== OVERVIEW CARD ================== */
+
+    .log-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .log-overview-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .log-overview-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--vscode-descriptionForeground, #888888);
+      opacity: 0.8;
+    }
+
+    .log-overview-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--vscode-foreground, #cccccc);
+      word-break: break-all;
+    }
+
+    /* ================== SECTION CARD ================== */
+
+    .log-section {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .log-section-header {
+      display: flex;
+      align-items: center;
+      padding: 10px 12px;
+      cursor: pointer;
+      background: var(--vscode-editor-background, #1e1e1e);
+      border-bottom: 1px solid var(--vscode-editorWidget-border, #444);
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+
+    .log-section-header:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .log-section-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      margin-right: 8px;
+      font-size: 12px;
+      transition: transform 0.2s ease;
+    }
+
+    .log-section.collapsed .log-section-toggle {
+      transform: rotate(-90deg);
+    }
+
+    .log-section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--vscode-foreground, #cccccc);
+      flex: 1;
+    }
+
+    .log-section-body {
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.2);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .log-section.collapsed .log-section-body {
+      display: none;
+    }
+
+    /* ================== CODE BLOCKS ================== */
+
+    .log-code {
+      background: var(--vscode-textCodeBlock-background, rgba(0, 0, 0, 0.3));
+      border-left: 3px solid var(--vscode-editorWidget-border, #444);
+      padding: 8px 12px;
+      border-radius: 3px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 11px;
+      color: var(--vscode-editor-foreground, #cccccc);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-x: auto;
+      margin: 0;
+    }
+
+    /* ================== MARKDOWN CONTENT ================== */
+
+    .log-markdown {
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--vscode-editor-foreground, #cccccc);
+    }
+
+    .log-markdown h1,
+    .log-markdown h2,
+    .log-markdown h3,
+    .log-markdown h4,
+    .log-markdown h5,
+    .log-markdown h6 {
+      margin: 10px 0 6px 0;
+      font-weight: 600;
+      color: var(--vscode-foreground, #ffffff);
+    }
+
+    .log-markdown h1 { font-size: 16px; }
+    .log-markdown h2 { font-size: 15px; }
+    .log-markdown h3 { font-size: 14px; }
+    .log-markdown h4 { font-size: 13px; }
+
+    .log-markdown p {
+      margin: 8px 0;
+    }
+
+    .log-markdown code {
+      background: var(--vscode-textCodeBlock-background, rgba(0, 0, 0, 0.3));
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 11px;
+      color: var(--vscode-textLink-foreground, #4fc1ff);
+    }
+
+    .log-markdown pre {
+      background: var(--vscode-textCodeBlock-background, rgba(0, 0, 0, 0.3));
+      border-left: 3px solid var(--vscode-editorWidget-border, #444);
+      padding: 8px 12px;
+      border-radius: 3px;
+      overflow-x: auto;
+      margin: 8px 0;
+    }
+
+    .log-markdown pre code {
+      background: transparent;
+      padding: 0;
+      color: var(--vscode-editor-foreground, #cccccc);
+    }
+
+    .log-markdown ul,
+    .log-markdown ol {
+      margin: 8px 0 8px 20px;
+    }
+
+    .log-markdown li {
+      margin: 4px 0;
+    }
+
+    /* ================== EMPTY STATE ================== */
+
+    .log-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--vscode-descriptionForeground, #888888);
+      text-align: center;
+      padding: 20px;
+    }
+
+    .log-empty-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    .log-empty-text {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .log-empty-hint {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    /* ================== UTILITY ================== */
+
+    .log-status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .log-status-badge.ok {
+      background: rgba(115, 201, 145, 0.2);
+      color: var(--vscode-testing-iconPassed, #73c991);
+    }
+
+    .log-status-badge.error {
+      background: rgba(244, 135, 113, 0.2);
+      color: var(--vscode-inputValidation-errorForeground, #f48771);
+    }
+
+    .log-status-badge.warning {
+      background: rgba(255, 193, 7, 0.2);
+      color: var(--vscode-inputValidation-warningForeground, #dca54b);
+    }
+
+    /* ================== SECTION-SPECIFIC ================== */
+
+    .log-section.default-expanded .log-section-body {
+      display: block;
+    }
+
+    .log-section.default-collapsed .log-section-body {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header with Navigation -->
+  <div class="log-header">
+    <div class="log-header-left">
+      <div>
+        <div class="log-title">📋 ChatDBG — Last Log</div>
+        <div class="log-timestamp" id="logTime"></div>
+      </div>
+    </div>
+
+    <div class="log-nav-container">
+      <select id="logNavSelect" class="log-nav-select">
+        <option value="">Loading entries...</option>
+      </select>
+      <div class="log-nav-buttons">
+        <button id="logPrevBtn" class="log-nav-btn" title="Previous entry">◀</button>
+        <button id="logNextBtn" class="log-nav-btn" title="Next entry">▶</button>
+      </div>
+    </div>
+
+    <div class="log-header-right">
+      <button id="logCopyBtn" class="log-action-btn" title="Copy all">📋 Copy</button>
+      <button id="logRefreshBtn" class="log-action-btn" title="Refresh">🔄 Refresh</button>
+      <button id="logRawBtn" class="log-action-btn" title="Open raw log file">📄 Raw</button>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="log-content" id="logContent">
+    <div class="log-empty">
+      <div class="log-empty-icon">📖</div>
+      <div class="log-empty-text">No log entries found</div>
+      <div class="log-empty-hint">Run ChatDBG to generate logs</div>
+    </div>
+  </div>
+
+  <script src="openLog.js"></script>
+</body>
+</html>
