@@ -1,0 +1,908 @@
+/**
+ * ChatDBG Webview Panel Styles
+ *
+ * This stylesheet styles the ChatDBG webview panel using VSCode's theme variables
+ * for seamless integration with the user's chosen color theme.
+ *
+ * Key Design Principles:
+ * - Uses VSCode CSS variables (--vscode-*) for colors, fonts, and spacing
+ * - Responsive layout with flexbox
+ * - Accessible contrast ratios
+ * - Consistent with VSCode's UI patterns
+ */
+
+/* ============================================================
+   ROOT AND GLOBAL STYLES
+   ============================================================ */
+
+:root {
+  /* Prefer dark color scheme by default */
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  /* Use VSCode's editor font with fallbacks */
+  font-family: var(--vscode-editor-font-family, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: var(--vscode-editor-font-size, 13px);
+  /* Match VSCode's editor background and foreground */
+  background-color: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
+}
+
+#root {
+  /* Full viewport height with vertical flex layout */
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   TOOLBAR - Action Buttons
+   ============================================================ */
+
+#toolbar {
+  /* Horizontal layout with space between left and right groups */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--vscode-panel-border, rgba(255, 255, 255, 0.08));
+  background-color: var(--vscode-titleBar-activeBackground, #1e1e1e);
+  gap: 8px;
+}
+
+.toolbar-left {
+  /* Wrap action buttons if toolbar is narrow */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.toolbar-right {
+  /* Status indicators and secondary controls */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#toolbar button {
+  /* Secondary button styling matching VSCode's button theme */
+  border: 1px solid var(--vscode-button-border, transparent);
+  border-radius: 4px;
+  padding: 3px 9px;
+  background-color: var(--vscode-button-secondaryBackground, #2d2d30);
+  color: var(--vscode-button-foreground, #ffffff);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#toolbar button:hover {
+  /* Subtle hover effect */
+  background-color: var(--vscode-button-secondaryHoverBackground, #3a3a3d);
+}
+
+/* ============================================================
+   STATUS PILL - Connection/Run Status Indicator
+   ============================================================ */
+
+#status-pill {
+  /* Small pill-shaped badge showing current status */
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px; /* Fully rounded ends */
+  background-color: var(--vscode-statusBar-background, #007acc22);
+  color: var(--vscode-statusBar-foreground, #ffffff);
+}
+
+/* ============================================================
+   MAIN LAYOUT - Two-Column Design
+   ============================================================ */
+
+#main-layout {
+  /* Take remaining vertical space below toolbar */
+  flex: 1;
+  display: flex;
+  min-height: 0; /* Critical: allows children to scroll independently */
+}
+
+#transcript-panel {
+  /* Left panel: larger width for transcript output (60%) */
+  flex: 3;
+  border-right: 1px solid var(--vscode-panel-border, rgba(255, 255, 255, 0.08));
+}
+
+#side-panel {
+  /* Right panel: diagnostics, history, settings (40%) */
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  min-width: 260px; /* Prevent panel from becoming too narrow */
+}
+
+/* ============================================================
+   PANELS - Reusable Panel Components
+   ============================================================ */
+
+.panel {
+  /* Standard panel container with flex layout */
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Enables proper scrolling */
+}
+
+.panel-header {
+  /* Panel title bar */
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--vscode-panel-border, rgba(255, 255, 255, 0.08));
+  background-color: var(--vscode-editorGroupHeader-tabsBackground, #252526);
+}
+
+.panel-header h3,
+.panel-header h4 {
+  /* Panel title styling */
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em; /* Slight tracking for readability */
+  color: var(--vscode-editorCodeLens-foreground, #bbbbbb);
+}
+
+.panel-body {
+  /* Scrollable content area within panel */
+  padding: 8px 10px;
+  flex: 1; /* Take remaining space */
+  min-height: 0; /* Required for overflow to work */
+}
+
+/* ============================================================
+   SCROLLABLE AREAS
+   ============================================================ */
+
+.scrollable {
+  /* Enable vertical and horizontal scrolling as needed */
+  overflow: auto;
+}
+
+/* ============================================================
+   MARKDOWN RENDERING - Transcript Output
+   ============================================================ */
+
+.markdown {
+  /* Base markdown container */
+  line-height: 1.6;
+  font-size: 13px;
+}
+
+/* Headings in markdown output */
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5 {
+  margin: 16px 0 8px;
+  font-weight: 600;
+  color: var(--vscode-foreground);
+}
+
+.markdown h2 {
+  font-size: 18px;
+  border-bottom: 1px solid var(--vscode-panel-border, rgba(255, 255, 255, 0.1));
+  padding-bottom: 4px;
+}
+
+.markdown h3 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Paragraphs */
+.markdown p {
+  margin: 8px 0;
+}
+
+/* Inline code snippets */
+.markdown code {
+  font-family: var(--vscode-editor-font-family, "SF Mono", "Consolas", monospace);
+  font-size: 0.9em;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background-color: var(--vscode-textCodeBlock-background, #2a2d2e);
+  color: var(--vscode-textPreformat-foreground, #d4d4d4);
+}
+
+/* Code blocks */
+.markdown pre {
+  padding: 12px;
+  border-radius: 6px;
+  background-color: var(--vscode-textCodeBlock-background, #1e1e1e);
+  border: 1px solid var(--vscode-panel-border, rgba(255, 255, 255, 0.08));
+  overflow: auto; /* Horizontal scroll for long lines */
+  margin: 10px 0;
+}
+
+/* Code inside pre blocks (don't double-style) */
+.markdown pre code {
+  padding: 0;
+  background: none;
+  font-size: 12px;
+}
+
+/* Lists */
+.markdown ul,
+.markdown ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+.markdown li {
+  margin: 4px 0;
+}
+
+/* Strong emphasis */
+.markdown strong {
+  font-weight: 600;
+  color: var(--vscode-textLink-activeForeground);
+}
+
+/* Blockquotes */
+.markdown blockquote {
+  margin: 10px 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--vscode-textLink-foreground);
+  background-color: var(--vscode-textBlockQuote-background, rgba(127, 127, 127, 0.1));
+}
+
+/* ============================================================
+   DIAGNOSTICS & HISTORY - Side Panel Lists
+   ============================================================ */
+
+/* Empty state message */
+.empty-state {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground, #888888);
+}
+
+/* Diagnostic error/warning items */
+.diagnostic-item {
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer; /* Clickable to navigate to source */
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.diagnostic-item:hover {
+  background-color: var(--vscode-list-hoverBackground, #2a2d2e);
+}
+
+.diagnostic-file {
+  /* File path and line number */
+  opacity: 0.85;
+}
+
+.diagnostic-message {
+  /* Error/warning message */
+  font-weight: 500;
+}
+
+/* History panel separator */
+#history-panel {
+  border-top: 1px solid var(--vscode-panel-border, rgba(255, 255, 255, 0.08));
+}
+
+/* Previous run items in history */
+.history-item {
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer; /* Clickable to view transcript */
+  font-size: 12px;
+  margin-bottom: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.history-item:hover {
+  background-color: var(--vscode-list-hoverBackground, #2a2d2e);
+  border-color: var(--vscode-focusBorder, #007acc);
+}
+
+.history-title {
+  /* File name */
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--vscode-foreground);
+}
+
+.history-meta {
+  /* Timestamp and status */
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground, #999999);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.history-summary {
+  /* Brief summary of the error */
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground, #aaa);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Run status banner */
+.run-banner {
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  border-left: 4px solid var(--vscode-textLink-foreground, #007acc);
+  background-color: var(--vscode-textBlockQuote-background, rgba(0, 122, 204, 0.1));
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.run-banner.success {
+  border-left-color: var(--vscode-testing-iconPassed, #73c991);
+  background-color: rgba(115, 201, 145, 0.1);
+}
+
+.run-banner.error {
+  border-left-color: var(--vscode-testing-iconFailed, #f48771);
+  background-color: rgba(244, 135, 113, 0.1);
+}
+
+/* ============================================================
+   STATUS BAR - Bottom Footer
+   ============================================================ */
+
+#status-bar {
+  /* Footer showing connection and run status */
+  padding: 4px 10px;
+  border-top: 1px solid var(--vscode-panel-border, rgba(255, 255, 255, 0.08));
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground, #999999);
+}
+
+/* ============================================================
+   SCROLLBAR CUSTOMIZATION
+   ============================================================ */
+
+/* Thin scrollbar track */
+.scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Subtle scrollbar thumb */
+.scrollable::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===========================
+   Settings UI / Summary
+   =========================== */
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.6rem;
+  padding: 0;
+  flex-wrap: wrap;
+}
+
+.settings-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+}
+
+.settings-header-left h4 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.settings-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  font-size: 11px;
+}
+
+/* Pills - Status indicators */
+
+.pill {
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 10px;
+  line-height: 1.3;
+  border: 1px solid transparent;
+  opacity: 0.85;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.pill:hover {
+  opacity: 1;
+}
+
+.pill-env {
+  border-color: var(--vscode-editorWidget-border, #444);
+  background: rgba(100, 181, 246, 0.08);
+}
+
+.pill-model {
+  border-color: var(--vscode-button-secondaryBorder, #555);
+  background: rgba(129, 199, 132, 0.08);
+}
+
+.pill-key {
+  border-color: var(--vscode-inputValidation-warningBorder, #b58900);
+  background: rgba(255, 193, 7, 0.08);
+}
+
+.pill-warning {
+  background: rgba(244, 135, 113, 0.12);
+  border-color: var(--vscode-inputValidation-errorBorder, #f48771);
+  color: var(--vscode-inputValidation-errorForeground, #f48771);
+}
+
+.pill-success {
+  background: rgba(115, 201, 145, 0.12);
+  border-color: var(--vscode-testing-iconPassed, #73c991);
+  color: var(--vscode-testing-iconPassed, #73c991);
+}
+
+/* Settings body - Hidden by default, shown when expanded */
+
+#settings-body {
+  display: none;
+}
+
+#settings-panel:not(.settings-collapsed) #settings-body {
+  display: flex !important;
+}
+
+/* Settings toggle button */
+
+.settings-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: var(--vscode-foreground);
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.7;
+  transition: all 0.15s ease;
+}
+
+.settings-toggle-btn:hover {
+  opacity: 1;
+}
+
+.toggle-arrow {
+  display: inline-block;
+  transition: transform 0.2s ease;
+  font-size: 10px;
+}
+
+#settings-panel.settings-collapsed .toggle-arrow {
+  transform: rotate(-90deg);
+}
+
+/* Settings sections */
+
+/* Settings panel layout improvements */
+
+#settings-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  border-top: 1px solid var(--vscode-panel-border, rgba(255, 255, 255, 0.08));
+  max-height: none;
+}
+
+.settings-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 10px;
+}
+
+.settings-section {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.settings-section:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.settings-section:not(:first-child) {
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--vscode-editorWidget-border, #333);
+}
+
+.settings-section-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  color: var(--vscode-foreground);
+}
+
+/* Settings rows */
+
+.settings-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0;
+}
+
+.settings-row:last-child {
+  margin-bottom: 0;
+}
+
+.settings-row-inline {
+  flex-direction: row;
+  align-items: center;
+}
+
+.settings-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--vscode-foreground);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  opacity: 0.95;
+}
+
+.settings-label-help {
+  font-size: 11px;
+  opacity: 0.6;
+  font-weight: 400;
+  margin-left: 0;
+  cursor: help;
+}
+
+.settings-value {
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground, #888888);
+  line-height: 1.4;
+  padding: 0.35rem 0.5rem;
+  border-radius: 3px;
+  background: var(--vscode-textCodeBlock-background, rgba(0, 0, 0, 0.2));
+  word-break: break-all;
+}
+
+.code-mono {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 11px;
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+/* Input styling */
+
+.settings-input {
+  font-size: 11px;
+  padding: 0.4rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid var(--vscode-editorWidget-border, #444);
+  background: var(--vscode-input-background, #1e1e1e);
+  color: var(--vscode-input-foreground, #cccccc);
+  font-family: var(--vscode-editor-font-family);
+  transition: all 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.settings-input:hover {
+  border-color: var(--vscode-editorWidget-border, #555);
+}
+
+.settings-input:focus {
+  border-color: var(--vscode-focusBorder, #007acc);
+  outline: 1px solid var(--vscode-focusBorder, #007acc);
+  outline-offset: -1px;
+  box-shadow: 0 0 0 3px rgba(0, 122, 204, 0.1);
+}
+
+.settings-input::placeholder {
+  color: var(--vscode-input-placeholderForeground, #666666);
+  opacity: 0.8;
+}
+
+/* Checkbox styling */
+
+.settings-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  user-select: none;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.settings-checkbox input[type="checkbox"] {
+  width: 13px;
+  height: 13px;
+  cursor: pointer;
+  accent-color: var(--vscode-focusBorder, #007acc);
+  flex-shrink: 0;
+}
+
+.settings-checkbox:hover {
+  opacity: 0.85;
+}
+
+/* Status text */
+
+.settings-status {
+  font-size: 10px;
+  padding: 0.3rem 0.4rem;
+  border-radius: 2px;
+  margin-top: 0.2rem;
+  line-height: 1.3;
+}
+
+.settings-status.success {
+  background: rgba(115, 201, 145, 0.12);
+  color: var(--vscode-testing-iconPassed, #73c991);
+}
+
+.settings-status.error {
+  background: rgba(244, 135, 113, 0.12);
+  color: var(--vscode-inputValidation-errorForeground, #f48771);
+}
+
+.settings-status.warning {
+  background: rgba(255, 193, 7, 0.12);
+  color: var(--vscode-inputValidation-warningForeground, #dca54b);
+}
+
+.settings-status.info {
+  background: rgba(100, 181, 246, 0.12);
+  color: var(--vscode-textLink-foreground, #4fc1ff);
+}
+
+/* Radio button styling */
+
+.settings-radio-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  font-size: 11px;
+  padding: 0.4rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.settings-radio-group:hover {
+  background: var(--vscode-list-hoverBackground, rgba(255, 255, 255, 0.05));
+  border-color: var(--vscode-focusBorder, #007acc);
+}
+
+.settings-radio-group input[type="radio"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: var(--vscode-focusBorder, #007acc);
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+.settings-radio-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+}
+
+.settings-radio-title {
+  font-weight: 600;
+  color: var(--vscode-foreground);
+  display: block;
+}
+
+.settings-radio-desc {
+  font-size: 10px;
+  color: var(--vscode-descriptionForeground, #888888);
+  opacity: 0.85;
+  display: block;
+}
+
+/* Footer / Action buttons */
+
+.settings-footer {
+  border-top: 1px solid var(--vscode-editorWidget-border, #333);
+  padding-top: 0.8rem;
+  margin-top: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.settings-footer > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.settings-footer > div > div:first-child {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  opacity: 0.9;
+  margin-bottom: 0.2rem;
+}
+
+.settings-footer button {
+  font-size: 11px;
+  padding: 0.4rem 0.6rem;
+  border-radius: 3px;
+  border: 1px solid var(--vscode-button-border, transparent);
+  background: var(--vscode-button-secondaryBackground, #2d2d30);
+  color: var(--vscode-button-foreground, #ffffff);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.settings-footer button:hover {
+  background: var(--vscode-button-secondaryHoverBackground, #3a3a3d);
+}
+
+.settings-footer button:active {
+  background: var(--vscode-button-hoverBackground, #404040);
+}
+
+/* Environment status indicator */
+
+.env-status {
+  font-size: 10px;
+  padding: 0.4rem 0.5rem;
+  border-radius: 3px;
+  border-left: 2px solid transparent;
+  margin-top: 0.3rem;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+.env-status.ok {
+  background: rgba(115, 201, 145, 0.12);
+  border-left-color: var(--vscode-testing-iconPassed, #73c991);
+  color: var(--vscode-testing-iconPassed, #73c991);
+}
+
+.env-status.error {
+  background: rgba(244, 135, 113, 0.12);
+  border-left-color: var(--vscode-inputValidation-errorBorder, #f48771);
+  color: var(--vscode-inputValidation-errorForeground, #f48771);
+}
+
+/* ============================================================
+   Settings UI - Helper Hints & Tooltips
+   ============================================================ */
+
+.settings-label-help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+  opacity: 0.6;
+  cursor: help;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.settings-label-help:hover {
+  opacity: 1;
+  background: rgba(100, 181, 246, 0.15);
+  transform: scale(1.1);
+}
+
+
+/* Focus ring styling for accessibility */
+
+.settings-input:focus-visible {
+  outline: 2px solid var(--vscode-focusBorder, #007acc);
+  outline-offset: -2px;
+}
+
+.settings-checkbox input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--vscode-focusBorder, #007acc);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Settings section spacing improvements */
+
+.settings-section + .settings-section {
+  border-top: 1px solid var(--vscode-editorWidget-border, #333);
+}
+
+/* Placeholder text styling for inputs */
+
+.settings-input:disabled {
+  background: var(--vscode-input-disabledBackground, rgba(255, 255, 255, 0.05));
+  color: var(--vscode-disabledForeground, #666666);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Button group styling for multiple buttons */
+
+.settings-footer button + button {
+  margin-top: 0.3rem;
+}
+
+/* Status badge indicators */
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-badge.active {
+  background: rgba(115, 201, 145, 0.2);
+  color: var(--vscode-testing-iconPassed, #73c991);
+}
+
+.status-badge.inactive {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--vscode-descriptionForeground, #888);
+}
+
+/* Smooth transitions for settings */
+
+.settings-label,
+.settings-value,
+.settings-input,
+.settings-checkbox {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+  
